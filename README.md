@@ -1,23 +1,47 @@
-# investing
+# Investing Demo (modernized)
 
-# PostgreSQL (Docker)
-docker-compose -f docker-compose.yml up
+## Быстрый запуск БЕЗ токена Tinkoff
 
-# Tinkoff Invest API
-# TINKOFF_TOKEN указывается в config/settings.py
+```powershell
+python -m venv .venv
+.\.venv\Scripts\activate
+pip install -r requirements.txt
+copy .env.example .env
 
-# Первоначальная загрузка списка акций
+python manage.py migrate
+python manage.py seed_demo
+python manage.py runserver
+```
+
+Открой http://127.0.0.1:8000/ — увидишь 5 демо-акций с историей цен и графиками.
+
+## С T-Invest API (опционально)
+
+```powershell
+pip install t-tech-investments --index-url https://opensource.tbank.ru/api/v4/projects/238/packages/pypi/simple
+```
+
+В `.env` укажи `TINKOFF_TOKEN=...`, затем:
+
+```powershell
 python manage.py add_shares
+```
 
-# Celery Beat
-celery -A config beat
+Импорт в коде: `from t_tech.invest import Client`  
+(старый `from tinkoff.invest import ...` тоже поддерживается через совместимый слой).
 
-# Celery Worker
-celery -A config worker -l info
+## Команды
 
-# Celery Worker для Windows (Eventlet)
-pip install eventlet cryptography
-celery -A config worker -l info -P eventlet
+| Команда | Описание |
+|---------|----------|
+| `python manage.py seed_demo` | Демо-акции + история цен (без API) |
+| `python manage.py seed_demo --days 60 --clear` | Пересоздать демо за 60 дней |
+| `python manage.py add_shares` | Загрузить акции из T-Invest API |
 
-# API
-# /api/v1/shares — работа с акциями
+## Что сделано
+
+- Django 4.2+, Bootstrap 5, SQLite
+- Исправлены баги (detetime, None-сравнение, точность цены)
+- История цен + страница `/<id>/history/`
+- Работа без TOKEN на демо-данных
+- Совместимость с `t_tech.invest` и старым `tinkoff.invest`

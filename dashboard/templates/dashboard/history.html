@@ -1,0 +1,66 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}
+<title>История цен — {{ share.ticker }}</title>
+{% endblock %}
+
+{% block content %}
+<div class="mb-3">
+    <a href="{% url 'dashboard:detail' share.id %}" class="btn btn-outline-secondary btn-sm">&larr; К детали</a>
+    <a href="{% url 'dashboard:index' %}" class="btn btn-outline-secondary btn-sm">К списку</a>
+</div>
+
+<h2>История цен: {{ share.ticker }} — {{ share.name }}</h2>
+
+<form method="get" class="row g-2 mb-4">
+    <div class="col-auto">
+        <label class="col-form-label">Период (дней):</label>
+    </div>
+    <div class="col-auto">
+        <select name="days" class="form-select" onchange="this.form.submit()">
+            <option value="7" {% if days == 7 %}selected{% endif %}>7</option>
+            <option value="30" {% if days == 30 %}selected{% endif %}>30</option>
+            <option value="90" {% if days == 90 %}selected{% endif %}>90</option>
+            <option value="180" {% if days == 180 %}selected{% endif %}>180</option>
+            <option value="365" {% if days == 365 %}selected{% endif %}>365</option>
+        </select>
+    </div>
+</form>
+
+{% if stats %}
+<div class="row mb-4">
+    <div class="col-md-2"><div class="card"><div class="card-body"><small class="text-muted">Мин</small><div class="fs-5">{{ stats.min }}</div></div></div></div>
+    <div class="col-md-2"><div class="card"><div class="card-body"><small class="text-muted">Макс</small><div class="fs-5">{{ stats.max }}</div></div></div></div>
+    <div class="col-md-2"><div class="card"><div class="card-body"><small class="text-muted">Изменение</small><div class="fs-5 {% if stats.abs_change >= 0 %}text-success{% else %}text-danger{% endif %}">{{ stats.abs_change }}</div></div></div></div>
+    <div class="col-md-2"><div class="card"><div class="card-body"><small class="text-muted">%</small><div class="fs-5 {% if stats.pct_change >= 0 %}text-success{% else %}text-danger{% endif %}">{{ stats.pct_change }}%</div></div></div></div>
+    <div class="col-md-2"><div class="card"><div class="card-body"><small class="text-muted">Точек</small><div class="fs-5">{{ stats.count }}</div></div></div></div>
+</div>
+{% endif %}
+
+{% if plot_div %}
+<div class="mb-4">{{ plot_div|safe }}</div>
+{% endif %}
+
+{% if history %}
+<table class="table table-sm table-striped">
+    <thead>
+        <tr>
+            <th>Время</th>
+            <th>Цена</th>
+            <th>Источник</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for h in history %}
+        <tr>
+            <td>{{ h.recorded_at|date:"d.m.Y H:i" }}</td>
+            <td>{{ h.price }} {{ share.currency }}</td>
+            <td>{{ h.source }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p class="text-muted">История за выбранный период отсутствует. Запустите Celery-задачу <code>save_price_history</code> или дождитесь расписания.</p>
+{% endif %}
+{% endblock %}

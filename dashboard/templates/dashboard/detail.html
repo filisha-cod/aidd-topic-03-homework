@@ -1,32 +1,43 @@
 {% extends "dashboard/base.html" %}
 
 {% block title %}
-<title>Детальная информация</title>
+<title>{{ share.ticker }} — {{ share.name }}</title>
 {% endblock %}
 
 {% block content %}
-    <div class="row">
-    <div class="col3"></div>
-    <div class="col3">
-        Инструмент: {{ share.name }} <br>
-        Текущая цена: {{ share.last_price }} {{ share.currency }} <br>
-        Время последнего обновления: {{ share.updated_at }}
+<div class="mb-3">
+    <a href="{% url 'dashboard:index' %}" class="btn btn-outline-secondary btn-sm">&larr; К списку</a>
+    <a href="{% url 'dashboard:history' share.id %}" class="btn btn-outline-primary btn-sm">История цен (БД)</a>
+    {% if user.is_authenticated %}
+    <a href="{% url 'dashboard:update' share.id %}" class="btn btn-secondary btn-sm">Редактировать</a>
+    {% endif %}
+</div>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <h3>{{ share.name }} <small class="text-muted">({{ share.ticker }})</small></h3>
+        <p class="mb-1">ISIN: {{ share.isin }} | Валюта: {{ share.currency }}</p>
+        <p class="mb-1">
+            Текущая цена:
+            <strong class="{% if share.is_trend_high %}text-success{% else %}text-danger{% endif %}">
+                {{ share.last_price|default:"—" }} {{ share.currency }}
+            </strong>
+        </p>
+        <p class="text-muted small mb-0">Обновлено: {{ share.updated_at|default:"—" }}</p>
     </div>
-    <div class="col3"></div>
-    </div>
+</div>
 
+<form method="get" class="mb-3">
+    <label class="form-label">Период графика (дней):</label>
+    <select name="days" class="form-select w-auto d-inline-block" onchange="this.form.submit()">
+        <option value="30" {% if days == 30 %}selected{% endif %}>30</option>
+        <option value="90" {% if days == 90 %}selected{% endif %}>90</option>
+        <option value="180" {% if days == 180 %}selected{% endif %}>180</option>
+        <option value="365" {% if days == 365 %}selected{% endif %}>365</option>
+    </select>
+</form>
 
-      <div class="row mt-3">
-    <div class="col3"></div>
-    <div class="col3">
-    <h5>Исторические данные: </h5>
- {% autoescape off %}
-  {{ plot_div }}
-  {% endautoescape %}
-    </div>
-    <div class="col3"></div>
-    </div>
-
-
-
+<div class="mb-4">
+    {{ plot_div|safe }}
+</div>
 {% endblock %}

@@ -19,3 +19,33 @@ class Share(models.Model):
     class Meta:
         verbose_name = "Акция"
         verbose_name_plural = "Акции"
+        ordering = ["name"]
+
+    def __str__(self):
+        return f"{self.ticker} — {self.name}"
+
+
+class PriceHistory(models.Model):
+    """История изменения рыночных цен акций"""
+
+    share = models.ForeignKey(
+        Share, on_delete=models.CASCADE, related_name="price_history", verbose_name="Акция"
+    )
+    price = models.FloatField(verbose_name="Цена")
+    recorded_at = models.DateTimeField(verbose_name="Время записи", db_index=True)
+    source = models.CharField(
+        max_length=32, default="tinkoff", verbose_name="Источник"
+    )
+
+    class Meta:
+        verbose_name = "Запись истории цены"
+        verbose_name_plural = "История цен"
+        ordering = ["-recorded_at"]
+        indexes = [
+            models.Index(fields=["share", "-recorded_at"]),
+        ]
+        # Избегаем дублирования одной и той же цены в одну минуту
+        unique_together = [("share", "recorded_at")]
+
+    def __str__(self):
+        return f"{self.share.ticker}: {self.price} @ {self.recorded_at}"
