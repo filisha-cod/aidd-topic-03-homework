@@ -1,23 +1,42 @@
-# investing
+# Investing Demo — Agent B
 
-# PostgreSQL (Docker)
-docker-compose -f docker-compose.yml up
+Вторая независимая ветка домашнего задания (другой AI Coding Agent).
 
-# Tinkoff Invest API
-# TINKOFF_TOKEN указывается в config/settings.py
+## Новая функциональность
 
-# Первоначальная загрузка списка акций
-python manage.py add_shares
+**Виртуальный инвестиционный портфель**
+- создание персональных портфелей
+- покупка / продажа акций (моделирование)
+- средняя цена позиции, текущая стоимость, P&L
+- журнал операций
 
-# Celery Beat
-celery -A config beat
+## Запуск без токена
 
-# Celery Worker
-celery -A config worker -l info
+```powershell
+python -m venv .venv
+.\.venv\Scripts\activate
+pip install -r requirements.txt
+copy .env.example .env
+python manage.py migrate
+python manage.py seed_demo
+python manage.py runserver
+```
 
-# Celery Worker для Windows (Eventlet)
-pip install eventlet cryptography
-celery -A config worker -l info -P eventlet
+1. Зарегистрируйтесь / войдите  
+2. Откройте **Портфели** → создайте портфель  
+3. Совершите покупку/продажу по демо-акциям  
 
-# API
-# /api/v1/shares — работа с акциями
+## Отличия от Agent A (кратко)
+
+| | Agent A | Agent B |
+|---|---------|---------|
+| Новая фича | История цен | Виртуальный портфель |
+| Модели | PriceHistory | Portfolio, PortfolioItem, PortfolioTransaction |
+| Стиль | более агрессивный рефакторинг UI | явный service-слой сделок |
+| Графики | offline из БД + API | в основном API / заглушка |
+
+## SDK (опционально)
+
+```powershell
+pip install t-tech-investments --index-url https://opensource.tbank.ru/api/v4/projects/238/packages/pypi/simple
+```

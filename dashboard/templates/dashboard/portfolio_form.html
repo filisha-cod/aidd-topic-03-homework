@@ -1,0 +1,12 @@
+{% extends "dashboard/base.html" %}
+{% block title %}<title>Новый портфель</title>{% endblock %}
+{% block content %}
+<h2>Создать портфель</h2>
+<form method="post" class="mt-3" style="max-width:480px">
+    {% csrf_token %}
+    <div class="mb-3"><label class="form-label">Название</label>{{ form.name }}</div>
+    <div class="mb-3"><label class="form-label">Описание</label>{{ form.description }}</div>
+    <button type="submit" class="btn btn-primary">Создать</button>
+    <a href="{% url 'dashboard:portfolio_list' %}" class="btn btn-secondary">Отмена</a>
+</form>
+{% endblock %}

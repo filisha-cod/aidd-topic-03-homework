@@ -1,32 +1,21 @@
 {% extends "dashboard/base.html" %}
-
-{% block title %}
-<title>Детальная информация</title>
-{% endblock %}
-
+{% block title %}<title>{{ share.ticker }}</title>{% endblock %}
 {% block content %}
-    <div class="row">
-    <div class="col3"></div>
-    <div class="col3">
-        Инструмент: {{ share.name }} <br>
-        Текущая цена: {{ share.last_price }} {{ share.currency }} <br>
-        Время последнего обновления: {{ share.updated_at }}
+<a href="{% url 'dashboard:index' %}" class="btn btn-sm btn-outline-secondary mb-3">&larr; Назад</a>
+<div class="card mb-3">
+    <div class="card-body">
+        <h3>{{ share.name }} <small class="text-muted">{{ share.ticker }}</small></h3>
+        <p>Цена: <strong>{{ share.last_price|default:"—" }} {{ share.currency }}</strong></p>
+        <p class="small text-muted">Обновлено: {{ share.updated_at|default:"—" }}</p>
     </div>
-    <div class="col3"></div>
-    </div>
-
-
-      <div class="row mt-3">
-    <div class="col3"></div>
-    <div class="col3">
-    <h5>Исторические данные: </h5>
- {% autoescape off %}
-  {{ plot_div }}
-  {% endautoescape %}
-    </div>
-    <div class="col3"></div>
-    </div>
-
-
-
+</div>
+<form method="get" class="mb-2">
+    <select name="days" class="form-select form-select-sm w-auto d-inline" onchange="this.form.submit()">
+        <option value="30" {% if days == 30 %}selected{% endif %}>30д</option>
+        <option value="90" {% if days == 90 %}selected{% endif %}>90д</option>
+        <option value="180" {% if days == 180 %}selected{% endif %}>180д</option>
+        <option value="365" {% if days == 365 %}selected{% endif %}>365д</option>
+    </select>
+</form>
+{{ plot_div|safe }}
 {% endblock %}

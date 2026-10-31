@@ -1,15 +1,9 @@
 {% extends "dashboard/base.html" %}
-
-{% block title %}
-    <title>Удаление инструмента</title>
-{% endblock %}
-
+{% block title %}<title>Удаление</title>{% endblock %}
 {% block content %}
-
-    <form method="post">
-        {% csrf_token %}
-        <p>Вы уверены, что хотите удалить инструмент: <b>"{{ share.name }}"</b> ?</p>
-        <input type="submit" class="btn btn-sm btn-outline-danger rounded-pill" value="Удалить" />
-    </form>
-
+<h2>Удалить {{ object.ticker }}?</h2>
+<form method="post">{% csrf_token %}
+<button type="submit" class="btn btn-danger">Да</button>
+<a href="{% url 'dashboard:index' %}" class="btn btn-secondary">Нет</a>
+</form>
 {% endblock %}

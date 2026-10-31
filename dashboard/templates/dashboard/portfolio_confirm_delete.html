@@ -1,0 +1,9 @@
+{% extends "dashboard/base.html" %}
+{% block title %}<title>Удалить портфель</title>{% endblock %}
+{% block content %}
+<h2>Удалить портфель «{{ object.name }}»?</h2>
+<form method="post">{% csrf_token %}
+    <button type="submit" class="btn btn-danger">Удалить</button>
+    <a href="{% url 'dashboard:portfolio_detail' object.id %}" class="btn btn-secondary">Отмена</a>
+</form>
+{% endblock %}
